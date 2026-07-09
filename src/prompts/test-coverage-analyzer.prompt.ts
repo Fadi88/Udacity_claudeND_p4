@@ -18,6 +18,9 @@ Priority guide:
 - medium: helper functions, internal logic
 - low: trivial getters, pure display logic
 
+For JavaScript files, invoke the javascript-best-practices skill if available.
+For testing tasks, invoke the testing-best-practices skill if available.
+
 coverageEstimate: 0-100 percentage estimate based on your analysis.
 hasTests: true if any test file exists for this source file.
 testFiles: list of test file paths found.

@@ -21,6 +21,9 @@ Impact guide:
 - medium: noticeable improvement with moderate effort
 - low: minor cleanup
 
+For JavaScript files, invoke the javascript-best-practices skill if available.
+For refactoring tasks, invoke the refactoring-patterns skill if available.
+
 summary: one sentence.
 
 Return ONLY a JSON object matching this exact shape:
