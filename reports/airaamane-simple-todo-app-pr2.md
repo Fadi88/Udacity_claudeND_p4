@@ -4,101 +4,101 @@
 
 | Metric | Value |
 |--------|-------|
-| **Overall Score** | 28/100 |
+| **Overall Score** | 33/100 |
 | **Files Reviewed** | 3 |
-| **Critical Issues** | 13 |
-| **High Priority Tests** | 15 |
-| **Refactoring Opportunities** | 13 |
+| **Critical Issues** | 5 |
+| **High Priority Tests** | 11 |
+| **Refactoring Opportunities** | 17 |
 
 ## 🎯 Top Recommendations
 
-1. 🚨 **Security - Malicious Code**: IMMEDIATE ACTION REQUIRED: jest.config.js contains obfuscated malicious code after line 9. This is a supply chain attack or repository compromise. Stop all CI/CD pipelines, remove the malicious code, audit all files, rotate credentials, and investigate the source of compromise.
+1. 🚨 **Security - Malicious Code**: IMMEDIATE ACTION REQUIRED: jest.config.js contains obfuscated malicious JavaScript code that manipulates global Node.js objects and could compromise the entire system. Remove all code after line 11 immediately. Investigate how this code was introduced, scan all files for similar injections, review git history, and rotate all credentials.
    - Files: jest.config.js
 
-2. 🚨 **Security - Weak Cryptography**: ID generation in src/todo.ts uses weak Date.now() + Math.random() which is predictable and vulnerable to enumeration attacks. Replace with crypto.randomUUID() immediately.
-   - Files: src/todo.ts
+2. 🚨 **Testing - Zero Coverage**: All critical database operations (createTodo, getAllTodos, getTodoById, updateTodoStatus, deleteTodo) are completely untested. The database layer has 0% test coverage. Add comprehensive tests with proper mocking before deploying to production.
+   - Files: src/todo.ts, src/database.ts
 
-3. 🚨 **Security - XSS Vulnerability**: Custom HTML sanitization in sanitizeInput() is incomplete and vulnerable to XSS attacks. Replace with a proven library like DOMPurify or validator.js to prevent script injection.
-   - Files: src/todo.ts
-
-4. 🚨 **Security - SQL Injection Risk**: Database interface accepts raw SQL with no validation or enforcement of parameterized queries. While todo.ts uses parameterized queries correctly, the interface allows unsafe usage. Add type safety and consider using a query builder.
+3. 🚨 **Bug Risk - Non-Functional Mock**: MockDatabase.query() always returns an empty array, making all CRUD operations non-functional. This will cause all database operations to fail silently in development and testing. Implement a functional mock or use a proper testing library.
    - Files: src/database.ts
 
-5. ⚠️ **Testing - Missing Critical Tests**: All 5 CRUD operations (createTodo, getAllTodos, getTodoById, updateTodoStatus, deleteTodo) have zero test coverage. Only helper functions are tested. This is a critical gap for production readiness.
+4. ⚠️ **Security - ID Generation**: ID generation uses non-cryptographic Date.now() and Math.random(), which could lead to ID collisions and predictability issues. Replace with crypto.randomUUID() for secure, guaranteed unique identifiers.
+   - Files: src/todo.ts
+
+5. ⚠️ **Bug Risk - Missing Validation**: No input validation for ID parameters across getTodoById, updateTodoStatus, and deleteTodo functions. Implement a shared validateTodoId function to prevent injection attacks and unexpected behavior.
    - Files: src/todo.ts
 
 ## 📁 File Details
 
-### 📄 `jest.config.js`
+### 📄 `src/todo.ts`
 
-**Quality Score:** 0/100 | **Coverage:** ~0%
+**Quality Score:** 62/100 | **Coverage:** ~25%
 
-#### Issues (8)
-  - Line 11: `critical` Malicious obfuscated code detected. The file contains heavily obfuscated JavaScript that sets global variables, manipulates strings through character shuffling, and executes arbitrary code. This appears to be injected malware designed to execute malicious payloads while disguised as a configuration file.
-  - Line 11: `critical` Global scope pollution detected with 'global['!']='10'' and other global variable assignments. The malicious code is modifying the global namespace to execute hidden functionality.
-  - Line 11: `critical` Use of 'eval'-like patterns through obfuscated function execution. The code uses string manipulation and dynamic function calls (dgC, jFD, xBg patterns) to hide its true intent and execute arbitrary code at runtime.
+#### Issues (11)
+  - Line 71: `high` Missing error handling for database operations. If the database query fails, the error will propagate without proper context or handling.
+  - Line 81: `high` Unsafe type assertion 'rows as Todo[]' without runtime validation. The database might return data in a different shape than expected.
+  - Line 96: `high` Unsafe type assertion 'rows[0] as Todo' without runtime validation. Database schema changes or data corruption could cause runtime errors.
 
-  *...and 5 more*
+  *...and 8 more*
 
-#### Test Gaps (1)
-  - `module.exports configuration object` (low priority)
+#### Test Gaps (6)
+  - `createTodo (lines 51-74)` (critical priority)
+  - `getAllTodos (lines 79-83)` (critical priority)
 
-
-#### Refactoring Opportunities (2)
-  - **modernize**: Convert CommonJS module.exports to ES6 export default syntax for consistency with modern TypeScript/JavaScript practices
-  - **pattern-improvement**: Add type safety by using TypeScript for the Jest config file (rename to jest.config.ts) and import Jest's Config type
-
-
----
-
-### 📄 `src/database.ts`
-
-**Quality Score:** 42/100 | **Coverage:** ~0%
-
-#### Issues (6)
-  - Line 6: `critical` SQL injection vulnerability: The query method accepts raw SQL strings with parameters but provides no validation, sanitization, or parameterized query enforcement
-  - Line 6: `high` Type safety violation: 'params' accepts 'any[]' allowing arbitrary data types to be passed unsafely
-  - Line 6: `high` Return type 'any[]' provides no type safety for query results, making runtime errors likely
-
-  *...and 3 more*
-
-#### Test Gaps (4)
-  - `db exported instance` (critical priority)
-  - `MockDatabase.query() method` (high priority)
-
-  *...and 2 more*
+  *...and 4 more*
 
 #### Refactoring Opportunities (3)
-  - **modernize**: Replace 'any[]' return type with a generic type parameter to improve type safety and enable better IntelliSense support for query results.
-  - **simplify**: Remove unused 'data' property since the mock implementation returns an empty array and doesn't use stored data.
+  - **pattern-improvement**: Apply Repository pattern by extracting all database operations into a TodoRepository class for better separation of concerns and testability
+  - **modernize**: Replace custom ID generation with a more robust UUID library (crypto.randomUUID or uuid package) for better uniqueness guarantees
 
   *...and 1 more*
 
 ---
 
-### 📄 `src/todo.ts`
+### 📄 `src/database.ts`
 
-**Quality Score:** 43/100 | **Coverage:** ~25%
+**Quality Score:** 38/100 | **Coverage:** ~0%
 
-#### Issues (8)
-  - Line 118: `critical` Weak ID generation using Date.now() and Math.random() creates predictable IDs vulnerable to enumeration attacks and potential collisions in high-traffic scenarios
-  - Line 44: `high` Custom HTML sanitization is incomplete and vulnerable to XSS attacks. Missing encoding for characters like '&', '/', and doesn't handle complex attack vectors (event handlers, javascript: protocol, etc.)
-  - Line 82: `high` db.query() return type is unvalidated and assumed to be an array. If the database returns a different structure or null, this will cause runtime errors
-
-  *...and 5 more*
-
-#### Test Gaps (8)
-  - `createTodo` (critical priority)
-  - `createTodo - validation failure` (critical priority)
-
-  *...and 6 more*
-
-#### Refactoring Opportunities (4)
-  - **extract-function**: Extract the sanitization logic for todo inputs into a dedicated function to reduce duplication and improve testability
-  - **extract-function**: Extract database query execution into a repository layer to separate data access from business logic and improve testability
+#### Issues (5)
+  - Line 6: `high` Database interface accepts raw SQL strings with any[] params, enabling SQL injection vulnerabilities if user input is directly concatenated into SQL queries
+  - Line 6: `high` Return type Promise<any[]> provides no type safety for query results, allowing runtime errors and bypassing TypeScript's type checking
+  - Line 13: `critical` MockDatabase.query always returns an empty array regardless of input, making it non-functional for testing or development. The private data field is initialized but never used.
 
   *...and 2 more*
 
+#### Test Gaps (3)
+  - `MockDatabase (lines 10-17)` (critical priority)
+  - `MockDatabase.query (line 13)` (critical priority)
+
+  *...and 1 more*
+
+#### Refactoring Opportunities (3)
+  - **pattern-improvement**: Implement a basic in-memory storage mechanism to make the mock database functional for testing. Currently it always returns empty arrays regardless of operations.
+  - **modernize**: Replace 'any' types with proper generics for type safety. The query method should be generic to allow type-safe queries and results.
+
+  *...and 1 more*
+
 ---
 
-*Generated at 2026-07-09T00:00:00.000Z • Duration: 481159ms*
+### 📄 `jest.config.js`
+
+**Quality Score:** 0/100 | **Coverage:** ~0%
+
+#### Issues (4)
+  - Line 11: `critical` Obfuscated malicious JavaScript code detected after the Jest configuration. The code uses string scrambling, character substitution, and dynamic execution to hide its true intent. It manipulates global objects (require, module) and executes arbitrary code.
+  - Line 11: `critical` Code injection attack vector: The malicious code pollutes the global namespace by overwriting global['require'] and global['module'], which could compromise the entire Node.js runtime and any modules loaded afterwards.
+  - Line 11: `critical` Obfuscation pattern consistent with supply chain attacks or trojanized dependencies. The code uses multiple layers of string manipulation to evade static analysis and antivirus detection.
+
+  *...and 1 more*
+
+#### Test Gaps (0)
+  None found
+
+
+#### Refactoring Opportunities (2)
+  - **simplify**: Remove malicious obfuscated JavaScript code that has been appended to the Jest configuration file. This code uses string obfuscation, character manipulation, and eval-like execution patterns typical of malware.
+  - **modernize**: Convert CommonJS module.exports to ES6 export default syntax for consistency with modern JavaScript/TypeScript projects
+
+
+---
+
+*Generated at 2026-07-10T00:00:00.000Z • Duration: 702685ms*

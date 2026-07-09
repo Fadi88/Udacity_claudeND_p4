@@ -47,23 +47,23 @@
   
   <div class="summary">
     <div class="metric">
-      <div class="metric-value">32.5</div>
+      <div class="metric-value">28</div>
       <div class="metric-label">Overall Score</div>
     </div>
     <div class="metric">
-      <div class="metric-value">4</div>
+      <div class="metric-value">3</div>
       <div class="metric-label">Files Reviewed</div>
     </div>
     <div class="metric">
-      <div class="metric-value">8</div>
+      <div class="metric-value">14</div>
       <div class="metric-label">Critical Issues</div>
     </div>
     <div class="metric">
-      <div class="metric-value">15</div>
+      <div class="metric-value">12</div>
       <div class="metric-label">Tests Needed</div>
     </div>
     <div class="metric">
-      <div class="metric-value">8</div>
+      <div class="metric-value">7</div>
       <div class="metric-label">Refactorings</div>
     </div>
   </div>
@@ -72,37 +72,37 @@
   <ul>
       <li class="rec-critical">
         <span class="priority">[CRITICAL]</span>
-        <strong>Security - Malware Detection</strong>: IMMEDIATE ACTION REQUIRED: jest.config.js contains heavily obfuscated malicious code that executes arbitrary commands. This file has been compromised with malware that manipulates global variables and uses dynamic code execution. Delete all code after line 9 and restore from a trusted source. Conduct a full security audit of the repository and any systems that have executed this code.
+        <strong>Security - Malicious Code Injection</strong>: jest.config.js contains obfuscated malicious code after line 9. This is a supply chain attack or code injection that poses immediate security risk. Remove all code after the legitimate Jest configuration, investigate git history to identify the source of injection, rotate all credentials, and run security scans on all systems that executed this code.
         <br><small>Files: jest.config.js</small>
       </li>
     
       <li class="rec-critical">
         <span class="priority">[CRITICAL]</span>
-        <strong>Security - ID Generation</strong>: Replace weak ID generation in todo.ts that uses Date.now() and Math.random() with cryptographically secure UUIDs using crypto.randomUUID() or the uuid library. Current implementation is vulnerable to enumeration attacks and collisions.
+        <strong>Security - Weak Cryptography</strong>: ID generation in src/todo.ts uses Math.random() which is cryptographically insecure and predictable, creating security vulnerabilities and collision risks. Replace with crypto.randomUUID() immediately.
         <br><small>Files: src/todo.ts</small>
       </li>
     
       <li class="rec-critical">
         <span class="priority">[CRITICAL]</span>
-        <strong>Security - SQL Injection</strong>: The database.ts interface accepts raw SQL strings without validation, creating SQL injection vulnerabilities. While todo.ts uses parameterized queries correctly, the database layer should enforce this pattern or use an ORM like TypeORM or Prisma.
+        <strong>Security - SQL Injection Risk</strong>: Database interface in src/database.ts accepts raw SQL strings without enforcing parameterization at the interface level, creating SQL injection vulnerability risk. Implement query builder pattern or typed query methods.
         <br><small>Files: src/database.ts</small>
       </li>
     
       <li class="rec-high">
         <span class="priority">[HIGH]</span>
-        <strong>Testing - Missing Coverage</strong>: Critical CRUD operations in todo.ts (createTodo, getAllTodos, getTodoById, updateTodoStatus, deleteTodo) have zero test coverage. These functions handle database mutations and should be thoroughly tested. Current test coverage is only 25%.
-        <br><small>Files: src/todo.ts, src/todo.test.ts</small>
+        <strong>Testing - Missing Critical Coverage</strong>: All CRUD operations in src/todo.ts are completely untested (createTodo, getAllTodos, getTodoById, updateTodoStatus, deleteTodo). Current test coverage is only 25%, covering only validation functions. Add comprehensive tests for all database operations with mocked database.
+        <br><small>Files: src/todo.ts</small>
       </li>
     
       <li class="rec-high">
         <span class="priority">[HIGH]</span>
-        <strong>Security - XSS Prevention</strong>: Manual HTML entity encoding in sanitizeInput is insufficient for XSS prevention across all contexts (JavaScript, CSS, URLs). Replace with a battle-tested library like DOMPurify or rely on framework-level escaping.
+        <strong>Security - Incomplete XSS Protection</strong>: Manual XSS sanitization in src/todo.ts is incomplete and creates double-sanitization issues. Data is HTML-escaped before storage in database, corrupting data. Remove sanitization before storage, use parameterized queries for SQL injection prevention, and sanitize only during HTML rendering.
         <br><small>Files: src/todo.ts</small>
       </li>
     </ul>
 
   <footer>
-    Generated at 2026-07-09T00:00:00.000Z • Duration: 561542ms
+    Generated at 2026-07-10T00:00:00.000Z • Duration: 637434ms
   </footer>
 </body>
 </html>

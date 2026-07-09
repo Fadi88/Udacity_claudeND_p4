@@ -6,297 +6,90 @@
   },
   "fileReviews": [
     {
-      "file": "jest.config.js",
-      "codeQuality": {
-        "file": "jest.config.js",
-        "issues": [
-          {
-            "line": 11,
-            "severity": "critical",
-            "category": "security",
-            "description": "Malicious obfuscated code detected. The file contains heavily obfuscated JavaScript that sets global variables, manipulates strings through character shuffling, and executes arbitrary code. This appears to be injected malware designed to execute malicious payloads while disguised as a configuration file.",
-            "suggestion": "IMMEDIATELY remove all code after line 9 (the closing brace and semicolon of the Jest configuration). The legitimate Jest config ends at line 9. Replace the entire file with only the clean configuration object. Investigate how this code was injected, scan all systems for compromise, rotate credentials, and review all files in the repository for similar injections."
-          },
-          {
-            "line": 11,
-            "severity": "critical",
-            "category": "security",
-            "description": "Global scope pollution detected with 'global['!']='10'' and other global variable assignments. The malicious code is modifying the global namespace to execute hidden functionality.",
-            "suggestion": "Remove all malicious code. This is part of an attack vector that could exfiltrate data, download additional payloads, or compromise the build/test pipeline."
-          },
-          {
-            "line": 11,
-            "severity": "critical",
-            "category": "security",
-            "description": "Use of 'eval'-like patterns through obfuscated function execution. The code uses string manipulation and dynamic function calls (dgC, jFD, xBg patterns) to hide its true intent and execute arbitrary code at runtime.",
-            "suggestion": "Delete all obfuscated code immediately. This technique is commonly used by malware to evade static analysis and execute remote code."
-          },
-          {
-            "line": 11,
-            "severity": "critical",
-            "category": "security",
-            "description": "String obfuscation using character code manipulation with patterns like '\\x25', '\\x23', String.fromCharCode(127). This is a clear indicator of malicious intent to hide payload content from code review.",
-            "suggestion": "Remove all code beyond the legitimate Jest configuration. Report this incident to your security team and consider this repository compromised."
-          },
-          {
-            "line": 11,
-            "severity": "critical",
-            "category": "security",
-            "description": "Immediately Invoked Function Expression (IIFE) with obfuscated logic at the end. The pattern '(function(){...})()' is executing malicious code immediately when this file is loaded by Node.js during Jest test runs.",
-            "suggestion": "Delete the entire IIFE and all associated obfuscation functions. Every test run is currently executing this malware. Stop all CI/CD pipelines using this code immediately."
-          },
-          {
-            "line": 0,
-            "severity": "critical",
-            "category": "security",
-            "description": "Supply chain attack detected. A legitimate Jest configuration file has been compromised with injected malicious code. This suggests the repository, developer machine, or dependency chain has been compromised.",
-            "suggestion": "Conduct immediate security audit: 1) Restore jest.config.js from a known-good commit, 2) Scan all repository files for similar injections, 3) Check git history for unauthorized commits, 4) Verify all developer machines and CI/CD systems, 5) Rotate all credentials and secrets, 6) Review package.json dependencies for compromised packages."
-          },
-          {
-            "line": 4,
-            "severity": "low",
-            "category": "maintainability",
-            "description": "The testMatch pattern could be more specific. Using '**/*.test.ts' will match test files anywhere, which may include node_modules if not properly excluded.",
-            "suggestion": "Consider using a more specific pattern like 'src/**/*.test.ts' or ensuring node_modules is excluded in Jest configuration to avoid unintended test discovery."
-          },
-          {
-            "line": 0,
-            "severity": "info",
-            "category": "best-practice",
-            "description": "Missing moduleFileExtensions configuration. While ts-jest preset provides defaults, explicitly defining file extensions can improve clarity.",
-            "suggestion": "Consider adding 'moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json']' for explicit configuration."
-          }
-        ],
-        "overallScore": 0,
-        "summary": "CRITICAL SECURITY BREACH: This file contains heavily obfuscated malicious code injected after a legitimate Jest configuration, indicating a supply chain attack or repository compromise requiring immediate incident response."
-      },
-      "testCoverage": {
-        "file": "jest.config.js",
-        "hasTests": false,
-        "testFiles": [],
-        "untestedPaths": [
-          {
-            "type": "edge-case",
-            "location": "module.exports configuration object",
-            "priority": "low",
-            "reasoning": "Jest configuration files are typically not unit tested as they are declarative configuration consumed by the Jest framework itself, not executable business logic",
-            "suggestedTest": "Validate that Jest can successfully load and parse the configuration without errors by running jest --showConfig"
-          }
-        ],
-        "coverageEstimate": 0,
-        "summary": "Configuration file with no unit tests, which is appropriate as Jest configs are declarative and validated by the framework itself at runtime."
-      },
-      "refactorings": {
-        "file": "jest.config.js",
-        "suggestions": [
-          {
-            "type": "modernize",
-            "location": "module.exports",
-            "impact": "low",
-            "description": "Convert CommonJS module.exports to ES6 export default syntax for consistency with modern TypeScript/JavaScript practices",
-            "before": "module.exports = {\n  preset: 'ts-jest',\n  testEnvironment: 'node',\n  ...\n};",
-            "after": "export default {\n  preset: 'ts-jest',\n  testEnvironment: 'node',\n  ...\n};",
-            "benefits": "Aligns with modern ES6+ module syntax, improves consistency across the codebase, and Jest supports ES6 exports in config files"
-          },
-          {
-            "type": "pattern-improvement",
-            "location": "entire config",
-            "impact": "medium",
-            "description": "Add type safety by using TypeScript for the Jest config file (rename to jest.config.ts) and import Jest's Config type",
-            "before": "module.exports = {\n  preset: 'ts-jest',\n  testEnvironment: 'node',\n  ...\n};",
-            "after": "import type { Config } from '@jest/types';\n\nconst config: Config.InitialOptions = {\n  preset: 'ts-jest',\n  testEnvironment: 'node',\n  ...\n};\n\nexport default config;",
-            "benefits": "Adds type safety and IDE autocompletion for Jest configuration options, catches configuration errors at compile time, and improves maintainability"
-          }
-        ],
-        "summary": "Jest config can be modernized with ES6 syntax, enhanced with TypeScript type safety, and improved with additional configuration options for better test coverage and execution."
-      }
-    },
-    {
-      "file": "src/database.ts",
-      "codeQuality": {
-        "file": "src/database.ts",
-        "issues": [
-          {
-            "line": 6,
-            "severity": "critical",
-            "category": "security",
-            "description": "SQL injection vulnerability: The query method accepts raw SQL strings with parameters but provides no validation, sanitization, or parameterized query enforcement",
-            "suggestion": "Implement proper parameterized queries with prepared statements. Use a query builder library like TypeORM or Prisma, or validate and sanitize all SQL inputs. Never concatenate user input directly into SQL strings."
-          },
-          {
-            "line": 6,
-            "severity": "high",
-            "category": "security",
-            "description": "Type safety violation: 'params' accepts 'any[]' allowing arbitrary data types to be passed unsafely",
-            "suggestion": "Replace 'any[]' with a more specific type like 'unknown[]' or create a union type of allowed parameter types (string | number | boolean | null)[]"
-          },
-          {
-            "line": 6,
-            "severity": "high",
-            "category": "bug-risk",
-            "description": "Return type 'any[]' provides no type safety for query results, making runtime errors likely",
-            "suggestion": "Use TypeScript generics to provide type-safe results: 'query<T>(sql: string, params?: unknown[]): Promise<T[]>' or define specific result types"
-          },
-          {
-            "line": 12,
-            "severity": "medium",
-            "category": "maintainability",
-            "description": "Private property 'data' is declared but never used in the implementation",
-            "suggestion": "Either implement the mock database to use this property for storing/retrieving mock data, or remove it if not needed"
-          },
-          {
-            "line": 15,
-            "severity": "medium",
-            "category": "bug-risk",
-            "description": "Mock query method always returns empty array regardless of input, making it unsuitable for testing",
-            "suggestion": "Implement basic mock functionality that uses the 'data' Map to store and retrieve test data, or add a comment explaining this is intentionally non-functional"
-          },
-          {
-            "line": 20,
-            "severity": "medium",
-            "category": "best-practice",
-            "description": "Database instance exported as mutable constant allows external code to reassign it",
-            "suggestion": "Export as 'export const db: Database = new MockDatabase()' with type annotation, or make it a getter function to prevent reassignment"
-          }
-        ],
-        "overallScore": 42,
-        "summary": "Critical security vulnerabilities due to potential SQL injection and excessive use of 'any' types, combined with incomplete mock implementation and missing production-ready features significantly impact code quality."
-      },
-      "testCoverage": {
-        "file": "src/database.ts",
-        "hasTests": false,
-        "testFiles": [],
-        "untestedPaths": [
-          {
-            "type": "function",
-            "location": "db exported instance",
-            "priority": "critical",
-            "reasoning": "Exported singleton is the public API used throughout the application; must verify it's properly initialized and typed",
-            "suggestedTest": "Test that exported db instance is a MockDatabase, implements Database interface, and can execute queries"
-          },
-          {
-            "type": "function",
-            "location": "MockDatabase.query() method",
-            "priority": "high",
-            "reasoning": "Core database query method is currently a stub returning empty array; needs validation of params handling and return type",
-            "suggestedTest": "Test that query method accepts SQL string and optional params array, always returns empty array Promise, and handles missing params parameter"
-          },
-          {
-            "type": "edge-case",
-            "location": "MockDatabase.query() with null/undefined params",
-            "priority": "high",
-            "reasoning": "Default parameter handling needs verification to prevent runtime errors when params are not provided",
-            "suggestedTest": "Test query() called without params argument defaults to empty array and doesn't throw errors"
-          },
-          {
-            "type": "edge-case",
-            "location": "Concurrent query() calls",
-            "priority": "high",
-            "reasoning": "Database interface promises async behavior; must verify thread-safety and proper Promise handling",
-            "suggestedTest": "Test multiple simultaneous query() calls resolve independently without race conditions or shared state corruption"
-          }
-        ],
-        "coverageEstimate": 0,
-        "summary": "No tests found for src/database.ts; critical exported db instance, MockDatabase.query() method, and async/edge-case behavior are completely untested."
-      },
-      "refactorings": {
-        "file": "src/database.ts",
-        "suggestions": [
-          {
-            "type": "modernize",
-            "location": "Database interface - query method",
-            "impact": "medium",
-            "description": "Replace 'any[]' return type with a generic type parameter to improve type safety and enable better IntelliSense support for query results.",
-            "before": "export interface Database {\n  query(sql: string, params?: any[]): Promise<any[]>;\n}",
-            "after": "export interface Database {\n  query<T = any>(sql: string, params?: unknown[]): Promise<T[]>;\n}",
-            "benefits": "Improved type safety, better IntelliSense, allows callers to specify expected result type, replaces 'any' with 'unknown' for safer parameter typing"
-          },
-          {
-            "type": "simplify",
-            "location": "MockDatabase class - data property",
-            "impact": "low",
-            "description": "Remove unused 'data' property since the mock implementation returns an empty array and doesn't use stored data.",
-            "before": "class MockDatabase implements Database {\n  private data: Map<string, any[]> = new Map();\n\n  async query(sql: string, params: any[] = []): Promise<any[]> {\n    return [];\n  }\n}",
-            "after": "class MockDatabase implements Database {\n  async query(sql: string, params: any[] = []): Promise<any[]> {\n    return [];\n  }\n}",
-            "benefits": "Reduced memory footprint, clearer intent that this is a minimal mock, eliminates dead code"
-          },
-          {
-            "type": "pattern-improvement",
-            "location": "db export - singleton pattern",
-            "impact": "medium",
-            "description": "Replace direct instantiation with a factory function or dependency injection to improve testability and allow runtime database switching.",
-            "before": "export const db = new MockDatabase();",
-            "after": "export function createDatabase(): Database {\n  return new MockDatabase();\n}\n\nexport const db = createDatabase();",
-            "benefits": "Enhanced testability through dependency injection, easier to swap implementations, supports configuration-based instantiation"
-          }
-        ],
-        "summary": "The database module needs type safety improvements (replacing 'any' with generics and 'unknown'), removal of unused code (data property), and better dependency injection patterns for testability."
-      }
-    },
-    {
       "file": "src/todo.ts",
       "codeQuality": {
         "file": "src/todo.ts",
         "issues": [
           {
-            "line": 118,
-            "severity": "critical",
-            "category": "security",
-            "description": "Weak ID generation using Date.now() and Math.random() creates predictable IDs vulnerable to enumeration attacks and potential collisions in high-traffic scenarios",
-            "suggestion": "Use a cryptographically secure UUID library like 'crypto.randomUUID()' or 'uuid' package: import { randomUUID } from 'crypto'; return randomUUID();"
-          },
-          {
-            "line": 44,
-            "severity": "high",
-            "category": "security",
-            "description": "Custom HTML sanitization is incomplete and vulnerable to XSS attacks. Missing encoding for characters like '&', '/', and doesn't handle complex attack vectors (event handlers, javascript: protocol, etc.)",
-            "suggestion": "Use a proven sanitization library like DOMPurify or validator.js. For database storage, consider storing raw input and sanitizing only on output. Example: import validator from 'validator'; return validator.escape(input);"
-          },
-          {
-            "line": 82,
+            "line": 71,
             "severity": "high",
             "category": "bug-risk",
-            "description": "db.query() return type is unvalidated and assumed to be an array. If the database returns a different structure or null, this will cause runtime errors",
-            "suggestion": "Add proper type validation and error handling: const result = await db.query(query); if (!result || !Array.isArray(result)) { throw new Error('Invalid database response'); } return result as Todo[];"
+            "description": "Missing error handling for database operations. If the database query fails, the error will propagate without proper context or handling.",
+            "suggestion": "Wrap database operations in try-catch blocks and provide meaningful error messages. Consider creating custom error types for different failure scenarios."
           },
           {
-            "line": 91,
+            "line": 81,
             "severity": "high",
             "category": "bug-risk",
-            "description": "No validation that 'id' parameter is properly formatted before querying. Malformed IDs could cause database errors or unexpected behavior",
-            "suggestion": "Add input validation: if (!id || typeof id !== 'string' || id.trim().length === 0) { throw new Error('Invalid todo ID'); }"
+            "description": "Unsafe type assertion 'rows as Todo[]' without runtime validation. The database might return data in a different shape than expected.",
+            "suggestion": "Implement runtime type validation using a library like zod or io-ts, or manually validate each field before casting to Todo[]."
+          },
+          {
+            "line": 96,
+            "severity": "high",
+            "category": "bug-risk",
+            "description": "Unsafe type assertion 'rows[0] as Todo' without runtime validation. Database schema changes or data corruption could cause runtime errors.",
+            "suggestion": "Add runtime validation to ensure the returned data matches the Todo interface before casting."
+          },
+          {
+            "line": 88,
+            "severity": "medium",
+            "category": "security",
+            "description": "No input validation for the 'id' parameter. Malformed or malicious IDs could be passed to the database query.",
+            "suggestion": "Add validation to ensure 'id' matches expected format (e.g., starts with 'todo_', has valid length). Consider using a UUID validation library."
+          },
+          {
+            "line": 102,
+            "severity": "medium",
+            "category": "security",
+            "description": "No input validation for 'id' parameter in updateTodoStatus. Should validate ID format before database operation.",
+            "suggestion": "Create a shared 'validateTodoId' function and use it consistently across all functions that accept an ID parameter."
+          },
+          {
+            "line": 110,
+            "severity": "medium",
+            "category": "security",
+            "description": "No input validation for 'id' parameter in deleteTodo. Should validate ID format before database operation.",
+            "suggestion": "Implement ID validation to prevent potential injection attacks or unexpected behavior from malformed IDs."
           },
           {
             "line": 104,
-            "severity": "high",
-            "category": "bug-risk",
-            "description": "updateTodoStatus doesn't verify if the todo exists before updating. Silent failures may occur, and no feedback is provided to the caller",
-            "suggestion": "Check affected rows and return status: const result = await db.query(query, [completed, id]); if (result.rowCount === 0) { throw new Error('Todo not found'); }"
-          },
-          {
-            "line": 111,
-            "severity": "high",
-            "category": "bug-risk",
-            "description": "deleteTodo doesn't verify if the todo exists before deletion. Deleting non-existent IDs succeeds silently, which may mask bugs",
-            "suggestion": "Check affected rows: const result = await db.query(query, [id]); if (result.rowCount === 0) { throw new Error('Todo not found'); } return result.rowCount > 0;"
-          },
-          {
-            "line": 79,
             "severity": "medium",
-            "category": "performance",
-            "description": "getAllTodos retrieves all records without pagination. This will cause memory issues and slow response times as the dataset grows",
-            "suggestion": "Implement pagination: export async function getAllTodos(limit = 50, offset = 0): Promise<{ todos: Todo[], total: number }> { const query = 'SELECT * FROM todos ORDER BY created_at DESC LIMIT $1 OFFSET $2'; }"
+            "category": "bug-risk",
+            "description": "updateTodoStatus does not verify if the todo exists or if the update affected any rows. Silent failures could occur.",
+            "suggestion": "Check the result of the query to verify at least one row was updated. Throw an error or return a boolean to indicate success/failure."
           },
           {
-            "line": 25,
+            "line": 112,
+            "severity": "medium",
+            "category": "bug-risk",
+            "description": "deleteTodo does not verify if the todo exists or if the deletion affected any rows. Silent failures could occur.",
+            "suggestion": "Check the result of the query to verify at least one row was deleted. Consider returning a boolean or throwing an error if the todo doesn't exist."
+          },
+          {
+            "line": 119,
+            "severity": "medium",
+            "category": "security",
+            "description": "ID generation uses Date.now() and Math.random() which are not cryptographically secure and could lead to ID collisions under high load.",
+            "suggestion": "Use a proper UUID library (e.g., 'crypto.randomUUID()' or 'uuid' package) to generate guaranteed unique and unpredictable IDs."
+          },
+          {
+            "line": 40,
             "severity": "low",
-            "category": "maintainability",
-            "description": "Magic numbers (200, 1000) for length validation are hardcoded. Should be configurable constants for easier maintenance",
-            "suggestion": "Define constants: const MAX_TITLE_LENGTH = 200; const MAX_DESCRIPTION_LENGTH = 1000; Use these in validation"
+            "category": "security",
+            "description": "Manual XSS sanitization is error-prone and may not cover all edge cases. Modern frameworks handle this automatically.",
+            "suggestion": "If rendering in a web context, rely on framework-level escaping (React, Vue, etc.) or use a well-tested library like DOMPurify. Document when/where this sanitization should be applied."
+          },
+          {
+            "line": 80,
+            "severity": "low",
+            "category": "performance",
+            "description": "No pagination or limit on getAllTodos. This could return thousands of records causing memory and performance issues.",
+            "suggestion": "Add pagination parameters (offset, limit) to getAllTodos and implement LIMIT/OFFSET in the SQL query."
           }
         ],
-        "overallScore": 43,
-        "summary": "The code demonstrates good intentions with parameterized queries and input validation, but suffers from critical security vulnerabilities in ID generation and sanitization, multiple high-severity bugs due to missing error handling and validation, and lacks pagination for scalability."
+        "overallScore": 62,
+        "summary": "The code demonstrates good security practices with parameterized queries and input sanitization, but suffers from missing error handling, unsafe type assertions, lack of input validation for IDs, non-cryptographic ID generation, and absence of pagination which could lead to runtime failures and security vulnerabilities."
       },
       "testCoverage": {
         "file": "src/todo.ts",
@@ -307,152 +100,316 @@
         "untestedPaths": [
           {
             "type": "function",
-            "location": "createTodo",
+            "location": "createTodo (lines 51-74)",
             "priority": "critical",
-            "reasoning": "Core CRUD operation with database interaction and security sanitization is completely untested",
-            "suggestedTest": "should create a todo with sanitized title and description, store it in database, and return todo object with generated id and createdAt timestamp"
-          },
-          {
-            "type": "branch",
-            "location": "createTodo - validation failure",
-            "priority": "critical",
-            "reasoning": "Error handling path when validation fails is untested, critical for API security",
-            "suggestedTest": "should throw 'Invalid todo input' error when provided with empty title"
+            "reasoning": "This is the primary data mutation function that creates todos in the database. It handles validation, sanitization, and database insertion - all critical paths that need testing for data integrity and security.",
+            "suggestedTest": "Test createTodo with valid input returns a Todo object with sanitized fields, correct ID format, completed=false, and createdAt timestamp; verify db.query is called with parameterized query"
           },
           {
             "type": "function",
-            "location": "getAllTodos",
+            "location": "getAllTodos (lines 79-83)",
             "priority": "critical",
-            "reasoning": "Public API function for retrieving all todos is completely untested, including ordering logic",
-            "suggestedTest": "should return all todos ordered by created_at in descending order (newest first)"
+            "reasoning": "Primary read operation for fetching all todos. Critical for application functionality and needs verification of correct query execution and data ordering.",
+            "suggestedTest": "Test getAllTodos returns array of todos ordered by created_at DESC; verify correct SQL query is executed"
           },
           {
             "type": "function",
-            "location": "getTodoById",
+            "location": "getTodoById (lines 88-97)",
             "priority": "critical",
-            "reasoning": "Public API function for retrieving specific todo is completely untested",
-            "suggestedTest": "should return todo object when given valid existing todo id"
-          },
-          {
-            "type": "branch",
-            "location": "getTodoById - not found",
-            "priority": "critical",
-            "reasoning": "Error path when todo doesn't exist is untested, critical for API contract",
-            "suggestedTest": "should return null when todo with given id does not exist"
+            "reasoning": "Read operation with two distinct return paths (found/not found). Critical for data retrieval and uses parameterized queries for security.",
+            "suggestedTest": "Test getTodoById with existing ID returns the correct Todo object with all fields populated"
           },
           {
             "type": "function",
-            "location": "updateTodoStatus",
+            "location": "updateTodoStatus (lines 102-105)",
             "priority": "critical",
-            "reasoning": "Public API function for updating todo completion status is completely untested",
-            "suggestedTest": "should update todo completed status to true when called with completed=true"
+            "reasoning": "Data mutation function for updating todo completion status. Critical for core application functionality and uses parameterized queries.",
+            "suggestedTest": "Test updateTodoStatus with valid ID and completed=true updates the todo status in database using parameterized query"
           },
           {
             "type": "function",
-            "location": "deleteTodo",
+            "location": "deleteTodo (lines 110-113)",
             "priority": "critical",
-            "reasoning": "Public API function for deleting todos is completely untested, critical data mutation operation",
-            "suggestedTest": "should delete todo from database when given valid todo id"
+            "reasoning": "Destructive data mutation operation. Critical to test for correct deletion and use of parameterized queries to prevent SQL injection.",
+            "suggestedTest": "Test deleteTodo with valid ID removes the todo from database using parameterized query with id parameter"
           },
           {
-            "type": "branch",
-            "location": "validateTodoInput - whitespace-only title",
-            "priority": "high",
-            "reasoning": "Title with only whitespace characters should be rejected but current tests only check empty string, not strings that become empty after trim()",
-            "suggestedTest": "should return false when title contains only whitespace characters (spaces, tabs, newlines)"
+            "type": "function",
+            "location": "generateId (lines 118-120)",
+            "priority": "medium",
+            "reasoning": "Helper function for generating unique IDs. Should be tested to ensure ID format consistency and basic uniqueness.",
+            "suggestedTest": "Test generateId returns string matching pattern 'todo_<timestamp>_<random>' and generates unique IDs on consecutive calls"
           }
         ],
         "coverageEstimate": 25,
-        "summary": "Only 2 of 9 exported functions are tested (validateTodoInput and sanitizeInput), with all 5 critical CRUD operations (createTodo, getAllTodos, getTodoById, updateTodoStatus, deleteTodo) completely untested."
+        "summary": "Only 2 of 8 functions are tested (validateTodoInput and sanitizeInput); all critical database operations (createTodo, getAllTodos, getTodoById, updateTodoStatus, deleteTodo) lack tests, leaving major data mutation and retrieval paths untested."
       },
       "refactorings": {
         "file": "src/todo.ts",
         "suggestions": [
           {
-            "type": "extract-function",
-            "location": "createTodo function, lines 55-56",
-            "impact": "medium",
-            "description": "Extract the sanitization logic for todo inputs into a dedicated function to reduce duplication and improve testability",
-            "before": "const sanitizedTitle = sanitizeInput(input.title.trim());\nconst sanitizedDescription = sanitizeInput(input.description || '');",
-            "after": "function sanitizeTodoInput(input: CreateTodoInput) {\n  return {\n    title: sanitizeInput(input.title.trim()),\n    description: sanitizeInput(input.description || '')\n  };\n}\n\nconst { title, description } = sanitizeTodoInput(input);",
-            "benefits": "Improved reusability, better separation of concerns, easier to test sanitization logic independently, reduces cognitive load in createTodo function"
-          },
-          {
-            "type": "extract-function",
-            "location": "createTodo, getAllTodos, getTodoById, updateTodoStatus, deleteTodo functions",
+            "type": "pattern-improvement",
+            "location": "createTodo, getAllTodos, getTodoById, etc. (lines 51-113)",
             "impact": "high",
-            "description": "Extract database query execution into a repository layer to separate data access from business logic and improve testability",
-            "before": "const query = 'INSERT INTO todos (id, title, description, completed, created_at) VALUES ($1, $2, $3, $4, $5)';\nconst params = [todo.id, todo.title, todo.description, todo.completed, todo.createdAt];\nawait db.query(query, params);",
-            "after": "class TodoRepository {\n  async create(todo: Todo): Promise<void> {\n    const query = 'INSERT INTO todos (id, title, description, completed, created_at) VALUES ($1, $2, $3, $4, $5)';\n    await db.query(query, [todo.id, todo.title, todo.description, todo.completed, todo.createdAt]);\n  }\n  async findAll(): Promise<Todo[]> { /* ... */ }\n  async findById(id: string): Promise<Todo | null> { /* ... */ }\n}\n\nconst todoRepo = new TodoRepository();\nawait todoRepo.create(todo);",
-            "benefits": "Separation of concerns, improved testability with mock repositories, easier database migration, follows repository pattern, better maintainability"
+            "description": "Apply Repository pattern by extracting all database operations into a TodoRepository class for better separation of concerns and testability",
+            "before": "export async function createTodo(input: CreateTodoInput): Promise<Todo> {\n  // validation and sanitization\n  const query = 'INSERT INTO todos...';\n  await db.query(query, params);\n  return todo;\n}",
+            "after": "class TodoRepository {\n  async create(todo: Todo): Promise<void> {\n    const query = 'INSERT INTO todos (id, title, description, completed, created_at) VALUES ($1, $2, $3, $4, $5)';\n    await db.query(query, [todo.id, todo.title, todo.description, todo.completed, todo.createdAt]);\n  }\n}",
+            "benefits": "Clear separation between business logic and data access, easier to mock database in tests, centralized query management, follows SOLID principles"
           },
           {
             "type": "modernize",
-            "location": "generateId function, line 119",
-            "impact": "low",
-            "description": "Replace custom ID generation with crypto.randomUUID() for better uniqueness and standard compliance",
+            "location": "generateId (lines 118-120)",
+            "impact": "medium",
+            "description": "Replace custom ID generation with a more robust UUID library (crypto.randomUUID or uuid package) for better uniqueness guarantees",
             "before": "function generateId(): string {\n  return `todo_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;\n}",
-            "after": "import { randomUUID } from 'crypto';\n\nfunction generateId(): string {\n  return `todo_${randomUUID()}`;\n}",
-            "benefits": "Better uniqueness guarantees, cryptographically secure, standard library support, prevents potential collisions in high-frequency scenarios"
+            "after": "import { randomUUID } from 'crypto';\n\nfunction generateId(): string {\n  return randomUUID();\n}",
+            "benefits": "Better collision resistance, follows RFC 4122 standard, cryptographically secure, industry best practice for unique identifiers"
+          },
+          {
+            "type": "modernize",
+            "location": "sanitizeInput (lines 40-46)",
+            "impact": "medium",
+            "description": "Replace manual character escaping with a Map-based approach for better maintainability and performance",
+            "before": "export function sanitizeInput(input: string): string {\n  return input\n    .replace(/</g, '&lt;')\n    .replace(/>/g, '&gt;')\n    .replace(/\"/g, '&quot;')\n    .replace(/'/g, '&#039;');\n}",
+            "after": "const HTML_ESCAPE_MAP: Record<string, string> = {\n  '<': '&lt;',\n  '>': '&gt;',\n  '\"': '&quot;',\n  \"'\": '&#039;'\n};\n\nexport function sanitizeInput(input: string): string {\n  return input.replace(/[<>\"']/g, (char) => HTML_ESCAPE_MAP[char]);\n}",
+            "benefits": "Better maintainability, easier to extend with additional escapes, single-pass regex replacement improves performance, clearer intent"
+          }
+        ],
+        "summary": "Found 8 refactoring opportunities including extracting repository pattern for data access (high impact), modernizing ID generation and sanitization (medium impact), and adding proper error handling throughout."
+      }
+    },
+    {
+      "file": "src/database.ts",
+      "codeQuality": {
+        "file": "src/database.ts",
+        "issues": [
+          {
+            "line": 6,
+            "severity": "high",
+            "category": "security",
+            "description": "Database interface accepts raw SQL strings with any[] params, enabling SQL injection vulnerabilities if user input is directly concatenated into SQL queries",
+            "suggestion": "Use parameterized queries with typed parameters, or provide a query builder interface that enforces safe query construction. Consider using an ORM or typed query builder like Kysely or Prisma."
+          },
+          {
+            "line": 6,
+            "severity": "high",
+            "category": "bug-risk",
+            "description": "Return type Promise<any[]> provides no type safety for query results, allowing runtime errors and bypassing TypeScript's type checking",
+            "suggestion": "Use generic types for query results: query<T>(sql: string, params?: any[]): Promise<T[]> or query<T = any>(sql: string, params?: any[]): Promise<T[]>"
+          },
+          {
+            "line": 13,
+            "severity": "critical",
+            "category": "bug-risk",
+            "description": "MockDatabase.query always returns an empty array regardless of input, making it non-functional for testing or development. The private data field is initialized but never used.",
+            "suggestion": "Implement basic mock functionality: parse simple SQL commands (SELECT, INSERT, UPDATE, DELETE) and interact with the 'data' Map, or document that this is intentionally a stub requiring external mocking library"
+          },
+          {
+            "line": 19,
+            "severity": "high",
+            "category": "bug-risk",
+            "description": "Exporting a singleton instance 'db' of MockDatabase prevents dependency injection and makes unit testing difficult",
+            "suggestion": "Export a factory function or use dependency injection: export const createDatabase = (): Database => new MockDatabase(); or export the class and let consumers instantiate it"
+          },
+          {
+            "line": 11,
+            "severity": "medium",
+            "category": "maintainability",
+            "description": "Private field 'data' is declared but never used in any methods, indicating dead code or incomplete implementation",
+            "suggestion": "Either implement the mock database to use the data Map for storing/retrieving records, or remove the unused field and add a comment explaining the mock's limitations"
+          }
+        ],
+        "overallScore": 38,
+        "summary": "Critical mock implementation issues with non-functional query method, high security and type safety risks from untyped SQL interface and any[] return types, and problematic singleton export pattern preventing testability."
+      },
+      "testCoverage": {
+        "file": "src/database.ts",
+        "hasTests": false,
+        "testFiles": [],
+        "untestedPaths": [
+          {
+            "type": "class",
+            "location": "MockDatabase (lines 10-17)",
+            "priority": "critical",
+            "reasoning": "MockDatabase is the core data layer implementation used by all database operations in the application. Without tests, there's no verification that database operations work correctly.",
+            "suggestedTest": "Test that MockDatabase.query() returns an empty array when called with any SQL string and optional parameters"
+          },
+          {
+            "type": "function",
+            "location": "MockDatabase.query (line 13)",
+            "priority": "critical",
+            "reasoning": "The query method is the only database operation interface. All CRUD operations depend on it, yet it has a trivial implementation that always returns empty array, which would break all todo operations.",
+            "suggestedTest": "Test query method with INSERT, SELECT, UPDATE, and DELETE SQL statements to verify it handles parameterized queries correctly"
+          },
+          {
+            "type": "edge-case",
+            "location": "Query error handling",
+            "priority": "critical",
+            "reasoning": "No error handling tests exist. Real databases can fail for many reasons (connection errors, syntax errors, constraint violations).",
+            "suggestedTest": "Test that query method properly handles and propagates errors for malformed SQL or database failures"
+          }
+        ],
+        "coverageEstimate": 0,
+        "summary": "No test coverage exists for database.ts; the Database interface and MockDatabase class are completely untested, leaving critical data layer functionality unverified."
+      },
+      "refactorings": {
+        "file": "src/database.ts",
+        "suggestions": [
+          {
+            "type": "pattern-improvement",
+            "location": "MockDatabase class, line 10",
+            "impact": "high",
+            "description": "Implement a basic in-memory storage mechanism to make the mock database functional for testing. Currently it always returns empty arrays regardless of operations.",
+            "before": "class MockDatabase implements Database {\n  private data: Map<string, any[]> = new Map();\n\n  async query(sql: string, params: any[] = []): Promise<any[]> {\n    return [];\n  }\n}",
+            "after": "class MockDatabase implements Database {\n  private tables: Map<string, Map<number, unknown>> = new Map();\n\n  async query<T = unknown>(sql: string, params: unknown[] = []): Promise<T[]> {\n    const sqlLower = sql.toLowerCase().trim();\n    if (sqlLower.startsWith('select')) return this.handleSelect<T>(sql);\n    if (sqlLower.startsWith('insert')) return this.handleInsert<T>(sql, params);\n    return [] as T[];\n  }\n}",
+            "benefits": "Makes the mock database actually functional for testing, supports basic CRUD operations, enables meaningful unit tests, provides realistic behavior for development."
+          },
+          {
+            "type": "modernize",
+            "location": "Database interface, line 6",
+            "impact": "medium",
+            "description": "Replace 'any' types with proper generics for type safety. The query method should be generic to allow type-safe queries and results.",
+            "before": "query(sql: string, params?: any[]): Promise<any[]>;",
+            "after": "query<T = unknown>(sql: string, params?: unknown[]): Promise<T[]>;",
+            "benefits": "Improves type safety, enables IDE autocomplete for query results, reduces runtime errors, makes the API more maintainable and self-documenting."
           },
           {
             "type": "pattern-improvement",
-            "location": "All exported functions",
-            "impact": "high",
-            "description": "Implement a service class pattern to encapsulate all todo operations and enable dependency injection for better testability",
-            "before": "export async function createTodo(input: CreateTodoInput): Promise<Todo> { /* ... */ }\nexport async function getAllTodos(): Promise<Todo[]> { /* ... */ }",
-            "after": "export class TodoService {\n  constructor(\n    private repository: TodoRepository,\n    private validator: TodoValidator,\n    private sanitizer: InputSanitizer\n  ) {}\n\n  async createTodo(input: CreateTodoInput): Promise<Todo> { /* ... */ }\n  async getAllTodos(): Promise<Todo[]> { /* ... */ }\n}",
-            "benefits": "Dependency injection support, easier mocking in tests, better encapsulation, follows SOLID principles, enables decorator pattern for logging/caching"
+            "location": "Module exports, line 19",
+            "impact": "medium",
+            "description": "Use a factory function instead of directly exporting an instance. This enables better testing and allows configuration.",
+            "before": "export const db = new MockDatabase();",
+            "after": "export function createDatabase(config?: { mock?: boolean }): Database {\n  if (config?.mock !== false) {\n    return new MockDatabase();\n  }\n  throw new Error('Production database not implemented');\n}\n\nexport const db = createDatabase({ mock: true });",
+            "benefits": "Enables dependency injection, supports multiple database implementations, makes testing easier, allows runtime configuration, follows factory pattern."
           }
         ],
-        "summary": "The file would benefit from extracting concerns into separate layers (repository, service, validation), modernizing ID generation and null handling, implementing better error reporting in validation, and applying service/repository patterns for improved testability and maintainability."
+        "summary": "Found 6 refactoring opportunities: replace 'any' types with generics for type safety, remove unused properties, implement functional mock database with basic CRUD operations, export MockDatabase class, introduce factory pattern for database creation, and enhance documentation."
+      }
+    },
+    {
+      "file": "jest.config.js",
+      "codeQuality": {
+        "file": "jest.config.js",
+        "issues": [
+          {
+            "line": 11,
+            "severity": "critical",
+            "category": "security",
+            "description": "Obfuscated malicious JavaScript code detected after the Jest configuration. The code uses string scrambling, character substitution, and dynamic execution to hide its true intent. It manipulates global objects (require, module) and executes arbitrary code.",
+            "suggestion": "IMMEDIATELY remove all code after line 11 (the closing brace and semicolon of the Jest config). Replace the entire file with only the legitimate Jest configuration (lines 1-11). Scan your system for additional compromised files and investigate how this malicious code was introduced."
+          },
+          {
+            "line": 11,
+            "severity": "critical",
+            "category": "security",
+            "description": "Code injection attack vector: The malicious code pollutes the global namespace by overwriting global['require'] and global['module'], which could compromise the entire Node.js runtime and any modules loaded afterwards.",
+            "suggestion": "Delete the malicious code immediately. Review all package.json dependencies for suspicious packages. Check npm audit and verify package integrity using lock files."
+          },
+          {
+            "line": 11,
+            "severity": "critical",
+            "category": "security",
+            "description": "Obfuscation pattern consistent with supply chain attacks or trojanized dependencies. The code uses multiple layers of string manipulation to evade static analysis and antivirus detection.",
+            "suggestion": "Quarantine this file immediately. Run a full security scan of your codebase. Check git history to identify when this code was introduced and by whom. Rotate any secrets or credentials that may have been exposed."
+          },
+          {
+            "line": 11,
+            "severity": "critical",
+            "category": "security",
+            "description": "Dynamic code execution vulnerability: The obfuscated code constructs and executes arbitrary JavaScript at runtime, which could exfiltrate environment variables, steal credentials, establish backdoors, or compromise the build/test pipeline.",
+            "suggestion": "Remove the malicious code. Audit all test runs and CI/CD pipeline executions for unauthorized network activity. Review logs for data exfiltration attempts."
+          }
+        ],
+        "overallScore": 0,
+        "summary": "CRITICAL SECURITY THREAT: This file contains heavily obfuscated malicious JavaScript code that manipulates global Node.js objects, executes arbitrary code, and poses severe risks including data exfiltration, credential theft, and system compromise. The file must be quarantined immediately and replaced with clean configuration."
+      },
+      "testCoverage": {
+        "file": "jest.config.js",
+        "hasTests": false,
+        "testFiles": [],
+        "untestedPaths": [],
+        "coverageEstimate": 0,
+        "summary": "This is a Jest configuration file that does not require testing; however, it contains obfuscated malicious code appended after the legitimate configuration."
+      },
+      "refactorings": {
+        "file": "jest.config.js",
+        "suggestions": [
+          {
+            "type": "simplify",
+            "location": "line 11",
+            "impact": "high",
+            "description": "Remove malicious obfuscated JavaScript code that has been appended to the Jest configuration file. This code uses string obfuscation, character manipulation, and eval-like execution patterns typical of malware.",
+            "before": "[obfuscated malicious code - approximately 3KB]",
+            "after": "// Remove entire line 11 - no replacement needed",
+            "benefits": "Critical security fix: eliminates malware that could compromise credentials, inject backdoors, exfiltrate sensitive data, or provide remote access to attackers. Restores file integrity and prevents execution of malicious code during Jest test runs."
+          },
+          {
+            "type": "modernize",
+            "location": "entire file",
+            "impact": "low",
+            "description": "Convert CommonJS module.exports to ES6 export default syntax for consistency with modern JavaScript/TypeScript projects",
+            "before": "module.exports = {",
+            "after": "export default {",
+            "benefits": "Aligns with modern ES6+ module standards, improves consistency with TypeScript codebase, better IDE support and type inference"
+          }
+        ],
+        "summary": "Critical: Remove malicious obfuscated code on line 11; consider modernizing to ES6 exports and making TypeScript transformation explicit."
       }
     }
   ],
   "summary": {
     "totalFiles": 3,
-    "overallScore": 28,
-    "criticalIssues": 13,
-    "highPriorityTests": 15,
-    "refactoringOpportunities": 13
+    "overallScore": 33,
+    "criticalIssues": 5,
+    "highPriorityTests": 11,
+    "refactoringOpportunities": 17
   },
   "recommendations": [
     {
       "priority": "critical",
       "category": "Security - Malicious Code",
-      "description": "IMMEDIATE ACTION REQUIRED: jest.config.js contains obfuscated malicious code after line 9. This is a supply chain attack or repository compromise. Stop all CI/CD pipelines, remove the malicious code, audit all files, rotate credentials, and investigate the source of compromise.",
+      "description": "IMMEDIATE ACTION REQUIRED: jest.config.js contains obfuscated malicious JavaScript code that manipulates global Node.js objects and could compromise the entire system. Remove all code after line 11 immediately. Investigate how this code was introduced, scan all files for similar injections, review git history, and rotate all credentials.",
       "files": [
         "jest.config.js"
       ]
     },
     {
       "priority": "critical",
-      "category": "Security - Weak Cryptography",
-      "description": "ID generation in src/todo.ts uses weak Date.now() + Math.random() which is predictable and vulnerable to enumeration attacks. Replace with crypto.randomUUID() immediately.",
+      "category": "Testing - Zero Coverage",
+      "description": "All critical database operations (createTodo, getAllTodos, getTodoById, updateTodoStatus, deleteTodo) are completely untested. The database layer has 0% test coverage. Add comprehensive tests with proper mocking before deploying to production.",
       "files": [
-        "src/todo.ts"
+        "src/todo.ts",
+        "src/database.ts"
       ]
     },
     {
       "priority": "critical",
-      "category": "Security - XSS Vulnerability",
-      "description": "Custom HTML sanitization in sanitizeInput() is incomplete and vulnerable to XSS attacks. Replace with a proven library like DOMPurify or validator.js to prevent script injection.",
-      "files": [
-        "src/todo.ts"
-      ]
-    },
-    {
-      "priority": "critical",
-      "category": "Security - SQL Injection Risk",
-      "description": "Database interface accepts raw SQL with no validation or enforcement of parameterized queries. While todo.ts uses parameterized queries correctly, the interface allows unsafe usage. Add type safety and consider using a query builder.",
+      "category": "Bug Risk - Non-Functional Mock",
+      "description": "MockDatabase.query() always returns an empty array, making all CRUD operations non-functional. This will cause all database operations to fail silently in development and testing. Implement a functional mock or use a proper testing library.",
       "files": [
         "src/database.ts"
       ]
     },
     {
       "priority": "high",
-      "category": "Testing - Missing Critical Tests",
-      "description": "All 5 CRUD operations (createTodo, getAllTodos, getTodoById, updateTodoStatus, deleteTodo) have zero test coverage. Only helper functions are tested. This is a critical gap for production readiness.",
+      "category": "Security - ID Generation",
+      "description": "ID generation uses non-cryptographic Date.now() and Math.random(), which could lead to ID collisions and predictability issues. Replace with crypto.randomUUID() for secure, guaranteed unique identifiers.",
+      "files": [
+        "src/todo.ts"
+      ]
+    },
+    {
+      "priority": "high",
+      "category": "Bug Risk - Missing Validation",
+      "description": "No input validation for ID parameters across getTodoById, updateTodoStatus, and deleteTodo functions. Implement a shared validateTodoId function to prevent injection attacks and unexpected behavior.",
+      "files": [
+        "src/todo.ts"
+      ]
+    },
+    {
+      "priority": "high",
+      "category": "Bug Risk - Unsafe Type Assertions",
+      "description": "Multiple unsafe type assertions (rows as Todo[], rows[0] as Todo) without runtime validation. Database schema changes or data corruption could cause runtime errors. Implement runtime validation using zod or io-ts.",
       "files": [
         "src/todo.ts"
       ]
@@ -460,23 +417,7 @@
     {
       "priority": "high",
       "category": "Bug Risk - Missing Error Handling",
-      "description": "CRUD functions don't validate inputs or check if operations succeeded. updateTodoStatus and deleteTodo don't verify if todos exist. getAllTodos and getTodoById don't validate database responses.",
-      "files": [
-        "src/todo.ts"
-      ]
-    },
-    {
-      "priority": "high",
-      "category": "Type Safety",
-      "description": "Excessive use of 'any' types in database.ts removes TypeScript's safety guarantees. Replace with generics for query results and 'unknown' for parameters.",
-      "files": [
-        "src/database.ts"
-      ]
-    },
-    {
-      "priority": "medium",
-      "category": "Performance - Missing Pagination",
-      "description": "getAllTodos retrieves all records without pagination, which will cause memory and performance issues as data grows. Implement limit/offset pagination.",
+      "description": "No error handling for database operations. Failed queries will propagate without context. Add try-catch blocks around all database operations with meaningful error messages.",
       "files": [
         "src/todo.ts"
       ]
@@ -484,24 +425,31 @@
     {
       "priority": "medium",
       "category": "Architecture - Repository Pattern",
-      "description": "Direct database calls in business logic make testing difficult. Extract database operations into a repository layer for better separation of concerns and testability.",
+      "description": "Apply Repository pattern to separate data access from business logic. Extract all database operations into a TodoRepository class for better testability and maintainability.",
       "files": [
-        "src/todo.ts",
+        "src/todo.ts"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "Type Safety - Generic Types",
+      "description": "Database interface uses any[] return type and parameters, bypassing TypeScript's type safety. Add generic types: query<T>(sql: string, params?: unknown[]): Promise<T[]>",
+      "files": [
         "src/database.ts"
       ]
     },
     {
-      "priority": "low",
-      "category": "Code Quality - Magic Numbers",
-      "description": "Hardcoded validation limits (200, 1000) should be extracted as named constants for maintainability.",
+      "priority": "medium",
+      "category": "Performance - Missing Pagination",
+      "description": "getAllTodos has no pagination, potentially returning thousands of records. Add offset/limit parameters to prevent memory issues and improve performance.",
       "files": [
         "src/todo.ts"
       ]
     }
   ],
   "metadata": {
-    "analyzedAt": "2026-07-09T00:00:00.000Z",
-    "duration": 481159,
+    "analyzedAt": "2026-07-10T00:00:00.000Z",
+    "duration": 702685,
     "agentVersions": {
       "code-quality-analyzer": "1.0",
       "test-coverage-analyzer": "1.0",

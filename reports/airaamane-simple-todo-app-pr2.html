@@ -47,7 +47,7 @@
   
   <div class="summary">
     <div class="metric">
-      <div class="metric-value">28</div>
+      <div class="metric-value">33</div>
       <div class="metric-label">Overall Score</div>
     </div>
     <div class="metric">
@@ -55,15 +55,15 @@
       <div class="metric-label">Files Reviewed</div>
     </div>
     <div class="metric">
-      <div class="metric-value">13</div>
+      <div class="metric-value">5</div>
       <div class="metric-label">Critical Issues</div>
     </div>
     <div class="metric">
-      <div class="metric-value">15</div>
+      <div class="metric-value">11</div>
       <div class="metric-label">Tests Needed</div>
     </div>
     <div class="metric">
-      <div class="metric-value">13</div>
+      <div class="metric-value">17</div>
       <div class="metric-label">Refactorings</div>
     </div>
   </div>
@@ -72,37 +72,37 @@
   <ul>
       <li class="rec-critical">
         <span class="priority">[CRITICAL]</span>
-        <strong>Security - Malicious Code</strong>: IMMEDIATE ACTION REQUIRED: jest.config.js contains obfuscated malicious code after line 9. This is a supply chain attack or repository compromise. Stop all CI/CD pipelines, remove the malicious code, audit all files, rotate credentials, and investigate the source of compromise.
+        <strong>Security - Malicious Code</strong>: IMMEDIATE ACTION REQUIRED: jest.config.js contains obfuscated malicious JavaScript code that manipulates global Node.js objects and could compromise the entire system. Remove all code after line 11 immediately. Investigate how this code was introduced, scan all files for similar injections, review git history, and rotate all credentials.
         <br><small>Files: jest.config.js</small>
       </li>
     
       <li class="rec-critical">
         <span class="priority">[CRITICAL]</span>
-        <strong>Security - Weak Cryptography</strong>: ID generation in src/todo.ts uses weak Date.now() + Math.random() which is predictable and vulnerable to enumeration attacks. Replace with crypto.randomUUID() immediately.
-        <br><small>Files: src/todo.ts</small>
+        <strong>Testing - Zero Coverage</strong>: All critical database operations (createTodo, getAllTodos, getTodoById, updateTodoStatus, deleteTodo) are completely untested. The database layer has 0% test coverage. Add comprehensive tests with proper mocking before deploying to production.
+        <br><small>Files: src/todo.ts, src/database.ts</small>
       </li>
     
       <li class="rec-critical">
         <span class="priority">[CRITICAL]</span>
-        <strong>Security - XSS Vulnerability</strong>: Custom HTML sanitization in sanitizeInput() is incomplete and vulnerable to XSS attacks. Replace with a proven library like DOMPurify or validator.js to prevent script injection.
-        <br><small>Files: src/todo.ts</small>
-      </li>
-    
-      <li class="rec-critical">
-        <span class="priority">[CRITICAL]</span>
-        <strong>Security - SQL Injection Risk</strong>: Database interface accepts raw SQL with no validation or enforcement of parameterized queries. While todo.ts uses parameterized queries correctly, the interface allows unsafe usage. Add type safety and consider using a query builder.
+        <strong>Bug Risk - Non-Functional Mock</strong>: MockDatabase.query() always returns an empty array, making all CRUD operations non-functional. This will cause all database operations to fail silently in development and testing. Implement a functional mock or use a proper testing library.
         <br><small>Files: src/database.ts</small>
       </li>
     
       <li class="rec-high">
         <span class="priority">[HIGH]</span>
-        <strong>Testing - Missing Critical Tests</strong>: All 5 CRUD operations (createTodo, getAllTodos, getTodoById, updateTodoStatus, deleteTodo) have zero test coverage. Only helper functions are tested. This is a critical gap for production readiness.
+        <strong>Security - ID Generation</strong>: ID generation uses non-cryptographic Date.now() and Math.random(), which could lead to ID collisions and predictability issues. Replace with crypto.randomUUID() for secure, guaranteed unique identifiers.
+        <br><small>Files: src/todo.ts</small>
+      </li>
+    
+      <li class="rec-high">
+        <span class="priority">[HIGH]</span>
+        <strong>Bug Risk - Missing Validation</strong>: No input validation for ID parameters across getTodoById, updateTodoStatus, and deleteTodo functions. Implement a shared validateTodoId function to prevent injection attacks and unexpected behavior.
         <br><small>Files: src/todo.ts</small>
       </li>
     </ul>
 
   <footer>
-    Generated at 2026-07-09T00:00:00.000Z • Duration: 481159ms
+    Generated at 2026-07-10T00:00:00.000Z • Duration: 702685ms
   </footer>
 </body>
 </html>

@@ -47,7 +47,7 @@
   
   <div class="summary">
     <div class="metric">
-      <div class="metric-value">82</div>
+      <div class="metric-value">72</div>
       <div class="metric-label">Overall Score</div>
     </div>
     <div class="metric">
@@ -59,11 +59,11 @@
       <div class="metric-label">Critical Issues</div>
     </div>
     <div class="metric">
-      <div class="metric-value">6</div>
+      <div class="metric-value">10</div>
       <div class="metric-label">Tests Needed</div>
     </div>
     <div class="metric">
-      <div class="metric-value">6</div>
+      <div class="metric-value">7</div>
       <div class="metric-label">Refactorings</div>
     </div>
   </div>
@@ -72,37 +72,37 @@
   <ul>
       <li class="rec-critical">
         <span class="priority">[CRITICAL]</span>
-        <strong>Testing</strong>: Add comprehensive test coverage for security-critical functions including email validation (isValidEmail) and XSS prevention (sanitizeInput). These functions have 0% test coverage despite being essential for application security.
+        <strong>Testing</strong>: Add comprehensive test suite covering all security-critical functions (isValidEmail, sanitizeInput, createUser) with edge cases and error paths
         <br><small>Files: fixtures/clean-code.ts</small>
       </li>
     
       <li class="rec-high">
         <span class="priority">[HIGH]</span>
-        <strong>Security</strong>: Replace the custom ID generation function with crypto.randomUUID() to prevent potential ID collisions in high-concurrency scenarios. The current implementation using Date.now() and Math.random() is not cryptographically secure.
+        <strong>Security</strong>: Replace Math.random() based ID generation with crypto.randomUUID() to ensure unique, cryptographically secure identifiers and prevent potential ID collision or prediction attacks
         <br><small>Files: fixtures/clean-code.ts</small>
       </li>
     
       <li class="rec-high">
         <span class="priority">[HIGH]</span>
-        <strong>Testing</strong>: Implement tests for all error handling branches in createUser function, including validation failures for missing email/name and invalid email format. These paths are currently untested.
+        <strong>Security</strong>: Enhance input sanitization by using a dedicated library (DOMPurify or he.js) to ensure comprehensive XSS protection beyond basic HTML entity encoding
         <br><small>Files: fixtures/clean-code.ts</small>
       </li>
     
       <li class="rec-medium">
         <span class="priority">[MEDIUM]</span>
-        <strong>Security</strong>: Consider using a more robust email validation library (like validator.js) instead of a simple regex pattern. The current regex is overly permissive and may allow invalid email formats.
+        <strong>Code Quality</strong>: Improve email validation with RFC 5322 compliant regex or use a validation library to handle edge cases and prevent invalid email formats from passing validation
         <br><small>Files: fixtures/clean-code.ts</small>
       </li>
     
       <li class="rec-medium">
         <span class="priority">[MEDIUM]</span>
-        <strong>Code Quality</strong>: Extract validation logic into a separate validateUserInput() function to improve testability and separation of concerns. This will make the codebase more maintainable.
+        <strong>Architecture</strong>: Refactor createUser to use factory pattern with dependency injection to improve testability and separation of concerns
         <br><small>Files: fixtures/clean-code.ts</small>
       </li>
     </ul>
 
   <footer>
-    Generated at 2026-07-09T12:00:00.000Z • Duration: 290488ms
+    Generated at 2026-07-10T00:00:00.000Z • Duration: 169939ms
   </footer>
 </body>
 </html>

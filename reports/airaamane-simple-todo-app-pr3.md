@@ -4,27 +4,27 @@
 
 | Metric | Value |
 |--------|-------|
-| **Overall Score** | 32.5/100 |
-| **Files Reviewed** | 4 |
-| **Critical Issues** | 8 |
-| **High Priority Tests** | 15 |
-| **Refactoring Opportunities** | 8 |
+| **Overall Score** | 28/100 |
+| **Files Reviewed** | 3 |
+| **Critical Issues** | 14 |
+| **High Priority Tests** | 12 |
+| **Refactoring Opportunities** | 7 |
 
 ## 🎯 Top Recommendations
 
-1. 🚨 **Security - Malware Detection**: IMMEDIATE ACTION REQUIRED: jest.config.js contains heavily obfuscated malicious code that executes arbitrary commands. This file has been compromised with malware that manipulates global variables and uses dynamic code execution. Delete all code after line 9 and restore from a trusted source. Conduct a full security audit of the repository and any systems that have executed this code.
+1. 🚨 **Security - Malicious Code Injection**: jest.config.js contains obfuscated malicious code after line 9. This is a supply chain attack or code injection that poses immediate security risk. Remove all code after the legitimate Jest configuration, investigate git history to identify the source of injection, rotate all credentials, and run security scans on all systems that executed this code.
    - Files: jest.config.js
 
-2. 🚨 **Security - ID Generation**: Replace weak ID generation in todo.ts that uses Date.now() and Math.random() with cryptographically secure UUIDs using crypto.randomUUID() or the uuid library. Current implementation is vulnerable to enumeration attacks and collisions.
+2. 🚨 **Security - Weak Cryptography**: ID generation in src/todo.ts uses Math.random() which is cryptographically insecure and predictable, creating security vulnerabilities and collision risks. Replace with crypto.randomUUID() immediately.
    - Files: src/todo.ts
 
-3. 🚨 **Security - SQL Injection**: The database.ts interface accepts raw SQL strings without validation, creating SQL injection vulnerabilities. While todo.ts uses parameterized queries correctly, the database layer should enforce this pattern or use an ORM like TypeORM or Prisma.
+3. 🚨 **Security - SQL Injection Risk**: Database interface in src/database.ts accepts raw SQL strings without enforcing parameterization at the interface level, creating SQL injection vulnerability risk. Implement query builder pattern or typed query methods.
    - Files: src/database.ts
 
-4. ⚠️ **Testing - Missing Coverage**: Critical CRUD operations in todo.ts (createTodo, getAllTodos, getTodoById, updateTodoStatus, deleteTodo) have zero test coverage. These functions handle database mutations and should be thoroughly tested. Current test coverage is only 25%.
-   - Files: src/todo.ts, src/todo.test.ts
+4. ⚠️ **Testing - Missing Critical Coverage**: All CRUD operations in src/todo.ts are completely untested (createTodo, getAllTodos, getTodoById, updateTodoStatus, deleteTodo). Current test coverage is only 25%, covering only validation functions. Add comprehensive tests for all database operations with mocked database.
+   - Files: src/todo.ts
 
-5. ⚠️ **Security - XSS Prevention**: Manual HTML entity encoding in sanitizeInput is insufficient for XSS prevention across all contexts (JavaScript, CSS, URLs). Replace with a battle-tested library like DOMPurify or rely on framework-level escaping.
+5. ⚠️ **Security - Incomplete XSS Protection**: Manual XSS sanitization in src/todo.ts is incomplete and creates double-sanitization issues. Data is HTML-escaped before storage in database, corrupting data. Remove sanitization before storage, use parameterized queries for SQL injection prevention, and sanitize only during HTML rendering.
    - Files: src/todo.ts
 
 ## 📁 File Details
@@ -33,43 +33,44 @@
 
 **Quality Score:** 0/100 | **Coverage:** ~0%
 
-#### Issues (5)
-  - Line 0: `critical` Malicious obfuscated code detected. The file contains heavily obfuscated JavaScript that attempts to hide its true purpose using string manipulation, character substitution, and dynamic code execution. This appears to be injected malware or backdoor code.
-  - Line 9: `critical` Dynamic code execution via obfuscated functions. The code uses techniques like `global['!']='10'`, string obfuscation functions (_$_1e42, sfL), and dynamic require statements to execute arbitrary code while evading detection.
-  - Line 9: `critical` Suspicious global variable manipulation. The code sets `global['!']='10'` and manipulates the global object to inject malicious functionality into the Node.js runtime environment.
+#### Issues (8)
+  - Line 10: `critical` Obfuscated malicious code detected. The file contains heavily obfuscated JavaScript code after the legitimate Jest configuration that attempts to hide its true behavior through string manipulation, character substitution, and dynamic code execution.
+  - Line 10: `critical` Global variable manipulation detected. The code sets global['!']='10' which is highly suspicious and indicative of malicious intent to pollute the global scope.
+  - Line 10: `critical` Dynamic code execution via obfuscated require() calls. The code appears to dynamically call require() through obfuscated global variable assignments, which can be used to load arbitrary modules or execute malicious code.
 
-  *...and 2 more*
+  *...and 5 more*
 
-#### Test Gaps (1)
-  - `obfuscated malicious code (lines after closing brace)` (critical priority)
+#### Test Gaps (2)
+  - `module.exports configuration object (lines 1-11)` (high priority)
+  - `Obfuscated malicious code (lines 11-end)` (critical priority)
 
 
 #### Refactoring Opportunities (1)
-  - **simplify**: Remove all malicious obfuscated code and keep only the legitimate Jest configuration. The file contains obfuscated JavaScript that appears to be malware injected after the valid configuration.
+  - **extract-function**: CRITICAL SECURITY ISSUE: Remove all obfuscated malicious code appended after the Jest configuration. This appears to be injected malware.
 
 
 ---
 
 ### 📄 `src/database.ts`
 
-**Quality Score:** 35/100 | **Coverage:** ~0%
+**Quality Score:** 43/100 | **Coverage:** ~0%
 
-#### Issues (4)
-  - Line 5: `critical` SQL injection vulnerability: The query method accepts raw SQL strings without any validation or sanitization, allowing arbitrary SQL commands to be executed.
-  - Line 6: `high` The params parameter uses 'any[]' type which disables type safety and allows any data type to be passed, increasing vulnerability to injection attacks and type-related bugs.
-  - Line 15: `high` The query method implementation ignores both the sql and params parameters, always returning an empty array. This will cause runtime failures when actual database operations are expected.
+#### Issues (5)
+  - Line 6: `critical` Database interface accepts raw SQL strings with arbitrary parameters, creating SQL injection vulnerability risk. No query parameterization or sanitization is enforced at the interface level.
+  - Line 14: `high` Mock database query method ignores both the sql parameter and params parameter, always returning an empty array. This will cause incorrect behavior in any code that relies on query results.
+  - Line 12: `medium` Private data field is initialized but never used. The Map structure suggests intent to store data, but the query method doesn't interact with it.
 
-  *...and 1 more*
+  *...and 2 more*
 
 #### Test Gaps (3)
-  - `MockDatabase constructor` (high priority)
-  - `MockDatabase.query()` (critical priority)
+  - `Database interface` (critical priority)
+  - `MockDatabase` (high priority)
 
   *...and 1 more*
 
 #### Refactoring Opportunities (2)
-  - **modernize**: Replace generic 'any' types with proper TypeScript generics for type safety. The query method should use generic types to maintain type information through the database layer.
-  - **pattern-improvement**: Replace singleton export with a factory function or dependency injection pattern. Exporting a mutable singleton makes testing difficult and creates tight coupling.
+  - **modernize**: Use generic types to allow type-safe query results instead of returning any[]
+  - **extract-function**: Add a factory function for database creation instead of exporting a singleton instance, enabling better testing and dependency injection
 
 
 ---
@@ -78,47 +79,25 @@
 
 **Quality Score:** 42/100 | **Coverage:** ~25%
 
-#### Issues (5)
-  - Line 120: `critical` Weak ID generation using Date.now() and Math.random() creates predictable IDs vulnerable to enumeration attacks and collisions
-  - Line 44: `high` HTML entity encoding is insufficient for XSS prevention in all contexts (JavaScript, CSS, URL attributes). This manual sanitization approach is error-prone and incomplete
-  - Line 74: `high` Database query execution lacks error handling. Failed queries will crash the application or leave it in inconsistent state
+#### Issues (8)
+  - Line 119: `critical` ID generation uses weak randomness (Math.random()) which is cryptographically insecure and predictable. Date.now() creates collision risks in concurrent environments.
+  - Line 43: `high` Manual XSS sanitization is incomplete and error-prone. Missing sanitization for other dangerous characters like backticks, and doesn't handle complex attack vectors (event handlers, javascript: URLs, etc.).
+  - Line 75: `high` db.query() return type is untyped and assumed to be an array. No error handling for database connection failures, constraint violations, or query errors.
 
-  *...and 2 more*
+  *...and 5 more*
 
-#### Test Gaps (5)
+#### Test Gaps (6)
   - `createTodo` (critical priority)
   - `getAllTodos` (critical priority)
 
-  *...and 3 more*
+  *...and 4 more*
 
-#### Refactoring Opportunities (2)
-  - **pattern-improvement**: Implement Repository pattern by creating a TodoRepository class to encapsulate all data access logic, improving testability and separation of concerns.
-  - **simplify**: Use a more robust UUID generation library like 'crypto.randomUUID()' (Node 15+) or 'uuid' package instead of timestamp-based IDs to avoid collisions.
-
-
----
-
-### 📄 `src/todo.test.ts`
-
-**Quality Score:** 53/100 | **Coverage:** ~35%
-
-#### Issues (3)
-  - Line 0: `high` Missing test for null/undefined inputs in validateTodoInput - the function may not handle these edge cases properly, leading to runtime errors
-  - Line 0: `high` Missing test for createTodo function which is imported but never tested - this is a critical function that should have comprehensive test coverage
-  - Line 0: `medium` Missing test for sanitizeInput handling of nested/encoded XSS attempts - only tests simple script tag, not sophisticated attacks
-
-
-#### Test Gaps (3)
-  - `createTodo (imported but not tested)` (critical priority)
-  - `validateTodoInput - boundary condition at exactly 200 characters` (high priority)
+#### Refactoring Opportunities (3)
+  - **simplify**: Replace boolean return with detailed validation result object to provide meaningful error messages to users
+  - **modernize**: Use crypto.randomUUID() for better uniqueness guarantees and security instead of timestamp + random
 
   *...and 1 more*
 
-#### Refactoring Opportunities (2)
-  - **extract-function**: Extract repeated test input creation into a factory function to reduce duplication and improve maintainability
-  - **pattern-improvement**: Use test.each or it.each pattern to parameterize similar validation tests and reduce duplication
-
-
 ---
 
-*Generated at 2026-07-09T00:00:00.000Z • Duration: 561542ms*
+*Generated at 2026-07-10T00:00:00.000Z • Duration: 637434ms*
